@@ -1,0 +1,156 @@
+syntax = "proto3";
+
+package qfin.twin.v1;
+
+// TwinService is the primary API for the quantum financial digital twin.
+service TwinService {
+  // CreateMarket initializes a new market simulation with the given configuration.
+  rpc CreateMarket(CreateMarketRequest) returns (CreateMarketResponse);
+
+  // InjectEvent introduces an external shock into the simulation.
+  rpc InjectEvent(InjectEventRequest) returns (InjectEventResponse);
+
+  // GetMarketState returns the current state of the simulated market.
+  rpc GetMarketState(GetMarketStateRequest) returns (GetMarketStateResponse);
+
+  // StreamMarketData streams real-time market data from the simulation.
+  rpc StreamMarketData(StreamMarketDataRequest) returns (stream MarketDataUpdate);
+
+  // RunScenario executes a predefined scenario and returns results.
+  rpc RunScenario(RunScenarioRequest) returns (RunScenarioResponse);
+}
+
+// ── Market Configuration ──
+
+message CreateMarketRequest {
+  string market_id = 1;
+  repeated AssetConfig assets = 2;
+  repeated AgentConfig agents = 3;
+  MarketParams params = 4;
+  QuantumConfig quantum = 5;
+}
+
+message AssetConfig {
+  string symbol = 1;
+  string name = 2;
+  double initial_price = 3;
+  double volatility = 4;
+  double drift = 5;
+  double supply = 6;
+}
+
+message AgentConfig {
+  string agent_type = 1;    // "market_maker", "momentum", "fundamental", "noise", "hedge_fund", "central_bank"
+  int32 count = 2;
+  double capital = 3;
+  map<string, double> params = 4;  // Agent-specific parameters
+}
+
+message MarketParams {
+  double tick_size = 1;
+  int32 max_order_size = 2;
+  double circuit_breaker_threshold = 3;
+  int32 circuit_breaker_cooldown_seconds = 4;
+  bool enable_short_selling = 5;
+  double transaction_tax = 6;
+}
+
+message QuantumConfig {
+  bool enable_qaoa = 1;
+  bool enable_annealing = 2;
+  bool enable_tensor_networks = 3;
+  int32 optimization_frequency_ticks = 4;
+}
+
+message CreateMarketResponse {
+  string market_id = 1;
+  int32 total_agents = 2;
+  int32 total_assets = 3;
+}
+
+// ── Event Injection ──
+
+message InjectEventRequest {
+  string market_id = 1;
+  string event_type = 2;    // "rate_hike", "bank_failure", "geopolitical", "flash_crash", "liquidity_injection"
+  map<string, double> params = 3;
+  int64 timestamp_ns = 4;
+}
+
+message InjectEventResponse {
+  bool accepted = 1;
+  string event_id = 2;
+  int64 estimated_impact_ticks = 3;
+}
+
+// ── Market State ──
+
+message GetMarketStateRequest {
+  string market_id = 1;
+}
+
+message GetMarketStateResponse {
+  string market_id = 1;
+  int64 current_tick = 2;
+  repeated AssetState assets = 3;
+  MarketMetrics metrics = 4;
+  int32 active_agents = 5;
+  int32 total_trades = 6;
+}
+
+message AssetState {
+  string symbol = 1;
+  double price = 2;
+  double bid = 3;
+  double ask = 4;
+  int64 volume = 5;
+  double volatility_30t = 6;
+}
+
+message MarketMetrics {
+  double vix_equivalent = 1;
+  double total_market_cap = 2;
+  double liquidity_index = 3;
+  double herfindahl_index = 4;
+  double systemic_risk_score = 5;
+}
+
+// ── Streaming ──
+
+message StreamMarketDataRequest {
+  string market_id = 1;
+  int32 frequency_ticks = 2;
+}
+
+message MarketDataUpdate {
+  int64 tick = 1;
+  repeated AssetState assets = 2;
+  repeated TradeUpdate trades = 3;
+  MarketMetrics metrics = 4;
+}
+
+message TradeUpdate {
+  string symbol = 1;
+  double price = 2;
+  int64 quantity = 3;
+  string buyer_type = 4;
+  string seller_type = 5;
+  int64 timestamp_ns = 6;
+}
+
+// ── Scenarios ──
+
+message RunScenarioRequest {
+  string scenario_id = 1;   // "flash_crash_2010", "gfc_2008", "covid_2020"
+  map<string, double> params = 2;
+  int32 max_ticks = 3;
+}
+
+message RunScenarioResponse {
+  string scenario_id = 1;
+  int32 ticks_simulated = 2;
+  double max_drawdown = 3;
+  int32 circuit_breaker_trips = 4;
+  int32 agent_bankruptcies = 5;
+  double systemic_risk_peak = 6;
+}
