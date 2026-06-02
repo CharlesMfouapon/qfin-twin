@@ -1,0 +1,85 @@
+[package]
+name = "qfin-twin"
+version = "0.1.0"
+edition = "2021"
+description = "Quantum financial digital twin — distributed market simulation with quantum-inspired optimization"
+license = "Apache-2.0"
+authors = ["Charles Mfouapon"]
+
+[dependencies]
+# Async runtime
+tokio = { version = "1", features = ["full"] }
+
+# gRPC
+tonic = "0.12"
+prost = "0.13"
+
+# Serialization
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+bincode = "1"
+
+# Linear algebra
+nalgebra = "0.33"
+
+# Random number generation
+rand = "0.8"
+rand_distr = "0.4"
+
+# Optimization
+argmin = "0.10"
+argmin-math = "0.4"
+
+# Time series
+chrono = { version = "0.4", features = ["serde"] }
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["json", "env-filter"] }
+
+# Error handling
+thiserror = "2"
+anyhow = "1"
+
+# Decimal precision
+rust_decimal = "1"
+rust_decimal_macros = "1"
+
+# Concurrent data structures
+dashmap = "6"
+parking_lot = "0.12"
+
+# UUID generation
+uuid = { version = "1", features = ["v4", "serde"] }
+
+# Statistical distributions
+statrs = "0.17"
+
+[dev-dependencies]
+criterion = "0.5"
+proptest = "1"
+tempfile = "3"
+
+[build-dependencies]
+tonic-build = "0.12"
+
+[[bin]]
+name = "qfin-twin"
+path = "src/main.rs"
+
+[[example]]
+name = "flash_crash"
+path = "examples/flash_crash.rs"
+
+[[example]]
+name = "contagion"
+path = "examples/contagion.rs"
+
+[[bench]]
+name = "simulation_bench"
+harness = false
+
+[profile.release]
+lto = true
+codegen-units = 1
+opt-level = 3
