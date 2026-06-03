@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: qfin-twin-master
+  labels:
+    app: qfin-twin
+    role: master
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: qfin-twin
+      role: master
+  template:
+    metadata:
+      labels:
+        app: qfin-twin
+        role: master
+    spec:
+      containers:
+      - name: master
+        image: charlesmfouapon/qfin-twin:latest
+        command: ["./qfin-twin"]
+        args: ["--mode", "master", "--port", "50051"]
+        ports:
+        - containerPort: 50051
+          name: grpc
+        env:
+        - name: RUST_LOG
+          value: "info"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "2000m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: qfin-twin-master
+spec:
+  selector:
+    app: qfin-twin
+    role: master
+  ports:
+  - port: 50051
+    targetPort: 50051
+    name: grpc
+  type: ClusterIP
